@@ -35,8 +35,13 @@ const deleteCard = (req, res) => {
     .orFail(() => new Error('Not found'))
     .then((card) => res.send({ message: `Карточка ${card.name} удалена` }))
     .catch((err) => {
-      // eslint-disable-next-line no-constant-condition
-      if (err.message === 'Not found' || 'CastError') {
+      if (err.name === 'CastError') {
+        res
+          .status(BAD_REQUEST)
+          .send({
+            message: 'Переданы некорректные данные для удаления карточки',
+          });
+      } else if (err.message === 'Not found') {
         res
           .status(NOT_FOUND)
           .send({

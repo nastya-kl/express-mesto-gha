@@ -1,22 +1,23 @@
-const User = require('../modules/user');
+const Card = require('../modules/card');
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
+const getCards = (req, res) => {
+  Card.find({})
+    .then((cards) => res.status(200).send(cards))
     .catch((err) => res.status(500).send({ message: `Произошла ошибка: ${err.message}` }));
 };
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).send({ data: user }))
+const createCard = (req, res) => {
+  Card.create({
+    ...req.body,
+    owner: req.user._id,
+  })
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
           .status(400)
           .send({
-            message: 'Переданы некорректные данные при обновлении профиля',
+            message: 'Переданы некорректные данные при создании карточки',
           });
       } else {
         res
@@ -28,17 +29,17 @@ const createUser = (req, res) => {
     });
 };
 
-const getUserById = (req, res) => {
-  User.findById(req.params.id)
+const deleteCard = (req, res) => {
+  Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(200).send(user))
+    .then((card) => res.send({ message: `Карточка ${card.name} удалена` }))
     .catch((err) => {
       // eslint-disable-next-line no-constant-condition
       if (err.message === 'Not found' || 'CastError') {
         res
           .status(404)
           .send({
-            message: 'Пользователь с таким id не найден',
+            message: 'Карточка с указанным id не найдена',
           });
       } else {
         res
@@ -50,29 +51,30 @@ const getUserById = (req, res) => {
     });
 };
 
-const updateProfile = (req, res) => {
-  const userId = req.user._id;
-  const { name, about } = req.body;
+const likeCard = (req, res) => {
+  const userID = req.user._id;
+  const { cardId } = req.params;
 
-  User.findByIdAndUpdate(userId, { name, about }, {
-    new: true,
-    runValidators: true,
-  })
+  Card.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: userID } },
+    { new: true },
+  )
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
           .status(400)
           .send({
-            message: 'Переданы некорректные данные при обновлении профиля',
+            message: 'Переданы некорректные данные для постановки лайка',
           });
       // eslint-disable-next-line no-constant-condition
       } else if (err.name === 'Not found' || 'CastError') {
         res
           .status(404)
           .send({
-            message: 'Пользователь с таким id не найден',
+            message: 'Передан несуществующий id карточки',
           });
       } else {
         res
@@ -84,29 +86,33 @@ const updateProfile = (req, res) => {
     });
 };
 
-const updateAvatar = (req, res) => {
-  const userId = req.user._id;
-  const { avatar } = req.body;
+const dislikeCard = (req, res) => {
+  const userID = req.user._id;
+  const { cardId } = req.params;
 
-  User.findByIdAndUpdate(userId, { avatar }, {
-    new: true,
-    runValidators: true,
-  })
+  // eslint-disable-next-line no-console
+  console.log(cardId);
+
+  Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: userID } },
+    { new: true },
+  )
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
           .status(400)
           .send({
-            message: 'Переданы некорректные данные при обновлении профиля',
+            message: 'Переданы некорректные данные для постановки лайка',
           });
       // eslint-disable-next-line no-constant-condition
       } else if (err.name === 'Not found' || 'CastError') {
         res
           .status(404)
           .send({
-            message: 'Пользователь с таким id не найден',
+            message: 'Передан несуществующий id карточки',
           });
       } else {
         res
@@ -119,9 +125,9 @@ const updateAvatar = (req, res) => {
 };
 
 module.exports = {
-  getUsers,
-  getUserById,
-  createUser,
-  updateProfile,
-  updateAvatar,
+  getCards,
+  createCard,
+  deleteCard,
+  likeCard,
+  dislikeCard,
 };

@@ -3,7 +3,7 @@ const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = require('../utils/erro
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.send(cards))
     .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` }));
 };
 
@@ -24,7 +24,7 @@ const createCard = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });
@@ -51,7 +51,7 @@ const deleteCard = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });
@@ -85,7 +85,7 @@ const likeCard = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });
@@ -104,13 +104,13 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => new Error('Not found'))
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
         res
           .status(BAD_REQUEST)
           .send({
-            message: 'Переданы некорректные данные для постановки лайка',
+            message: 'Переданы некорректные данные для снятия лайка',
           });
       } else if (err.message === 'Not found') {
         res
@@ -122,7 +122,7 @@ const dislikeCard = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });

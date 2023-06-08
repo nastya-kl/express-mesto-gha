@@ -3,7 +3,7 @@ const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = require('../utils/erro
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.send(users))
     .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` }));
 };
 
@@ -23,7 +23,7 @@ const createUser = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });
@@ -32,7 +32,7 @@ const createUser = (req, res) => {
 const getUserById = (req, res) => {
   User.findById(req.params.id)
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'Not found') {
         res
@@ -50,7 +50,7 @@ const getUserById = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });
@@ -65,7 +65,7 @@ const updateProfile = (req, res) => {
     runValidators: true,
   })
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
@@ -73,8 +73,13 @@ const updateProfile = (req, res) => {
           .send({
             message: 'Переданы некорректные данные при обновлении профиля',
           });
-      // eslint-disable-next-line no-constant-condition
-      } else if (err.name === 'Not found' || 'CastError') {
+      } else if (err.name === 'CastError') {
+        res
+          .status(BAD_REQUEST)
+          .send({
+            message: 'Передан некорректный id пользоателя',
+          });
+      } else if (err.name === 'Not found') {
         res
           .status(NOT_FOUND)
           .send({
@@ -84,7 +89,7 @@ const updateProfile = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });
@@ -99,7 +104,7 @@ const updateAvatar = (req, res) => {
     runValidators: true,
   })
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
@@ -107,8 +112,13 @@ const updateAvatar = (req, res) => {
           .send({
             message: 'Переданы некорректные данные при обновлении профиля',
           });
-      // eslint-disable-next-line no-constant-condition
-      } else if (err.name === 'Not found' || 'CastError') {
+      } else if (err.name === 'CastError') {
+        res
+          .status(BAD_REQUEST)
+          .send({
+            message: 'Передан некорректный id пользоателя',
+          });
+      } else if (err.name === 'Not found') {
         res
           .status(NOT_FOUND)
           .send({
@@ -118,7 +128,7 @@ const updateAvatar = (req, res) => {
         res
           .status(INTERNAL_SERVER_ERROR)
           .send({
-            message: `Произошла ошибка ${err.name}: ${err.message}`,
+            message: 'Ошибка по умолчанию',
           });
       }
     });

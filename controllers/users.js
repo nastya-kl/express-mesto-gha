@@ -34,12 +34,17 @@ const getUserById = (req, res) => {
     .orFail(() => new Error('Not found'))
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      // eslint-disable-next-line no-constant-condition
-      if (err.message === 'Not found' || 'CastError') {
+      if (err.message === 'Not found') {
         res
           .status(NOT_FOUND)
           .send({
             message: 'Пользователь с таким id не найден',
+          });
+      } else if (err.name === 'CastError') {
+        res
+          .status(BAD_REQUEST)
+          .send({
+            message: 'Введён некорректный id',
           });
       } else {
         res
@@ -60,7 +65,7 @@ const updateProfile = (req, res) => {
     runValidators: true,
   })
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
@@ -94,7 +99,7 @@ const updateAvatar = (req, res) => {
     runValidators: true,
   })
     .orFail(() => new Error('Not found'))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res

@@ -64,14 +64,13 @@ const likeCard = (req, res) => {
     .orFail(() => new Error('Not found'))
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res
           .status(BAD_REQUEST)
           .send({
             message: 'Переданы некорректные данные для постановки лайка',
           });
-      // eslint-disable-next-line no-constant-condition
-      } else if (err.name === 'Not found' || 'CastError') {
+      } else if (err.message === 'Not found') {
         res
           .status(NOT_FOUND)
           .send({
@@ -102,14 +101,13 @@ const dislikeCard = (req, res) => {
     .orFail(() => new Error('Not found'))
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res
           .status(BAD_REQUEST)
           .send({
             message: 'Переданы некорректные данные для постановки лайка',
           });
-      // eslint-disable-next-line no-constant-condition
-      } else if (err.name === 'Not found' || 'CastError') {
+      } else if (err.message === 'Not found') {
         res
           .status(NOT_FOUND)
           .send({

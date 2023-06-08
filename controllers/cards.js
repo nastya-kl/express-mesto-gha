@@ -1,9 +1,10 @@
 const Card = require('../modules/card');
+const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = require('../utils/errors');
 
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка: ${err.message}` }));
+    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` }));
 };
 
 const createCard = (req, res) => {
@@ -15,13 +16,13 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(400)
+          .status(BAD_REQUEST)
           .send({
             message: 'Переданы некорректные данные при создании карточки',
           });
       } else {
         res
-          .status(500)
+          .status(INTERNAL_SERVER_ERROR)
           .send({
             message: `Произошла ошибка ${err.name}: ${err.message}`,
           });
@@ -37,13 +38,13 @@ const deleteCard = (req, res) => {
       // eslint-disable-next-line no-constant-condition
       if (err.message === 'Not found' || 'CastError') {
         res
-          .status(404)
+          .status(NOT_FOUND)
           .send({
             message: 'Карточка с указанным id не найдена',
           });
       } else {
         res
-          .status(500)
+          .status(INTERNAL_SERVER_ERROR)
           .send({
             message: `Произошла ошибка ${err.name}: ${err.message}`,
           });
@@ -65,20 +66,20 @@ const likeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(400)
+          .status(BAD_REQUEST)
           .send({
             message: 'Переданы некорректные данные для постановки лайка',
           });
       // eslint-disable-next-line no-constant-condition
       } else if (err.name === 'Not found' || 'CastError') {
         res
-          .status(404)
+          .status(NOT_FOUND)
           .send({
             message: 'Передан несуществующий id карточки',
           });
       } else {
         res
-          .status(500)
+          .status(INTERNAL_SERVER_ERROR)
           .send({
             message: `Произошла ошибка ${err.name}: ${err.message}`,
           });
@@ -103,20 +104,20 @@ const dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(400)
+          .status(BAD_REQUEST)
           .send({
             message: 'Переданы некорректные данные для постановки лайка',
           });
       // eslint-disable-next-line no-constant-condition
       } else if (err.name === 'Not found' || 'CastError') {
         res
-          .status(404)
+          .status(NOT_FOUND)
           .send({
             message: 'Передан несуществующий id карточки',
           });
       } else {
         res
-          .status(500)
+          .status(INTERNAL_SERVER_ERROR)
           .send({
             message: `Произошла ошибка ${err.name}: ${err.message}`,
           });

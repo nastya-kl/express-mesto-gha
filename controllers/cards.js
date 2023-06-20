@@ -1,6 +1,7 @@
 const Card = require('../modules/card');
 const NotFound = require('../errors/NotFound');
 const BadRequest = require('../errors/BadRequest');
+const Forbidden = require('../errors/Forbidden');
 
 const getCards = (req, res, next) => {
   Card.find({})
@@ -33,10 +34,7 @@ const deleteCard = (req, res, next) => {
       if (card.owner.equals(ownerId)) {
         res.send({ message: `Карточка ${card.name} удалена` });
       } else {
-        Promise.reject(new Error())
-          .catch(() => res.status(403).send({
-            message: 'Невозможно удалить карточку, созданную другим пользователем',
-          }));
+        Promise.reject(new Forbidden('Невозможно удалить карточку, созданную другим пользователем'));
       }
     })
     .catch((err) => {
@@ -77,7 +75,7 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: userID } },
     { new: true },
   )
-    .orFail(() => new Error('Карточка с указанным id не найдена'))
+    .orFail(() => new NotFound('Карточка с указанным id не найдена'))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {

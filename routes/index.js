@@ -7,8 +7,6 @@ const NotFound = require('../errors/NotFound');
 router.use('/signin', signInValidation, login);
 router.use('/signup', signUpValidation, createUser);
 
-router.use(auth);
-
 router.use('/users', auth, require('./users'));
 router.use('/cards', auth, require('./cards'));
 

@@ -33,7 +33,9 @@ const createUser = (req, res, next) => {
 };
 
 const getUserById = (req, res, next) => {
-  User.findById(req.params.id)
+  const userId = req.params.id;
+
+  User.findById(userId)
     .orFail(() => new NotFound('Пользователь с таким id не найден'))
     .then((user) => res.send(user))
     .catch((err) => {

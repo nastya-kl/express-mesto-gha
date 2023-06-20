@@ -9,6 +9,8 @@ const regex = /https?:\/\/(www\.)?[-\w@:%\.\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w
 const userIdValidation = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().alphanum().min(24),
+  }).options({
+    allowUnknown: true,
   }),
 });
 
@@ -50,6 +52,8 @@ const signUpValidation = celebrate({
 const cardIdValidation = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().alphanum().min(24),
+  }).options({
+    allowUnknown: true,
   }),
 });
 

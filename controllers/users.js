@@ -20,7 +20,9 @@ const createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then(() => res.status(201).send(name, about, avatar, email))
+    .then(() => res.status(201).send({
+      data: name, about, avatar, email,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Переданы некорректные данные при создании профиля'));
@@ -37,7 +39,7 @@ const getUserById = (req, res, next) => {
 
   User.findById(userId)
     .orFail(() => new NotFound('Пользователь с таким id не найден'))
-    .then((user) => res.send(user))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Введён некорректный id'));

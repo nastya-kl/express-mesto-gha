@@ -1,6 +1,7 @@
 const { celebrate, Joi } = require('celebrate');
 
-const regex = /d/;
+// eslint-disable-next-line no-useless-escape
+const regex = /https?:\/\/(www\.)?[-\w@:%\.\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\.\+~#=//?&]*)/i;
 
 // Валидация:
 

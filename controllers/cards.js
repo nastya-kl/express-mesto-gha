@@ -34,7 +34,7 @@ const deleteCard = (req, res, next) => {
       if (card.owner.equals(ownerId)) {
         res.send({ message: `Карточка ${card.name} удалена` });
       } else {
-        Promise.reject(new Forbidden('Невозможно удалить карточку, созданную другим пользователем'));
+        next(new Forbidden('Невозможно удалить карточку, созданную другим пользователем'));
       }
     })
     .catch((err) => {

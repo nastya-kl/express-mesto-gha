@@ -28,11 +28,12 @@ const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const ownerId = req.user._id;
 
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .orFail(() => new NotFound('Карточка с указанным id не найдена'))
     .then((card) => {
       if (card.owner.equals(ownerId)) {
-        res.send({ message: `Карточка ${card.name} удалена` });
+        Card.deleteOne(card)
+          .then(() => res.send({ message: `Карточка ${card.name} удалена` }));
       } else {
         next(new Forbidden('Невозможно удалить карточку, созданную другим пользователем'));
       }

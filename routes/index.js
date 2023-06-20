@@ -7,8 +7,10 @@ const NotFound = require('../errors/NotFound');
 router.use('/signin', signInValidation, login);
 router.use('/signup', signUpValidation, createUser);
 
-router.use('/users', auth, require('./users'));
-router.use('/cards', auth, require('./cards'));
+router.use(auth);
+
+router.use('/users', require('./users'));
+router.use('/cards', require('./cards'));
 
 router.use('/*', (req, res, next) => {
   next(new NotFound('Такой ссылки не существует'));
